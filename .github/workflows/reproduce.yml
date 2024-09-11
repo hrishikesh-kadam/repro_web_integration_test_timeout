@@ -1,0 +1,42 @@
+name: reproduce
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  reproduce:
+    name: Reproduce on ${{ matrix.runner }} using Flutter ${{ matrix.ref }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      matrix:
+        runner: [ ubuntu-latest, macos-latest, windows-latest ]
+        ref: [ stable ]
+        experimental: [ true ]
+        include:
+          - runner: macos-latest
+            ref: beta
+            experimental: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hrishikesh-kadam/setup-flutter@v1
+        with:
+          ref: ${{ matrix.ref }}
+      - name: Web Integration Test
+        run: |
+          chromedriver --port=4444 &
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/app_test.dart \
+            -d web-server
