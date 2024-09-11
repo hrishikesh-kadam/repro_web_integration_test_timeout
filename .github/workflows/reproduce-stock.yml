@@ -1,4 +1,4 @@
-name: reproduce
+name: reproduce-stock
 
 on:
   push:
@@ -14,17 +14,19 @@ defaults:
     shell: bash
 
 jobs:
-  reproduce:
-    name: Reproduce on ${{ matrix.runner }} using Flutter ${{ matrix.ref }}
+  reproduce-stock:
+    name: ${{ matrix.device-id }} on ${{ matrix.runner }} using Flutter ${{ matrix.ref }}
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
+        device-id: [ web-server ]
         runner: [ ubuntu-latest, macos-latest, windows-latest ]
         ref: [ stable ]
         experimental: [ true ]
         include:
-          - runner: macos-latest
+          - device-id: web-server
+            runner: macos-latest
             ref: beta
             experimental: true
 
@@ -39,4 +41,4 @@ jobs:
           flutter drive \
             --driver=test_driver/integration_test.dart \
             --target=integration_test/app_test.dart \
-            -d web-server
+            --device-id ${{ matrix.device-id }}
