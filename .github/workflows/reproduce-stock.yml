@@ -8,6 +8,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # 10:00 AM IST / 4:30 AM GMT every Monday
+    - cron: '30 4 * * 1'
 
 defaults:
   run:
